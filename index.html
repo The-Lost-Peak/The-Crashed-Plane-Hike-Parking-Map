@@ -54,26 +54,27 @@
     }
   </style>
 <style>
-/* buttons: one frosted white capsule, same as the 3D route map above it on the hike page */
-.grp{position:absolute;right:10px;bottom:40px;z-index:10;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;
-  background:rgba(255,255,255,.86);box-shadow:0 4px 16px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%)}
-@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.grp{background:rgba(255,255,255,.95)}}
-.fs-btn{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.fs-btn+.fs-btn{border-top:1px solid rgba(0,0,0,.09)}
-.fs-btn:focus{outline:0}.fs-btn:active{background:rgba(0,0,0,.06)}
-@media(hover:hover){.fs-btn:hover{background:rgba(0,0,0,.05)}}
-.fs-btn svg{fill:none;stroke:#1c1c1e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;width:20px;height:20px;display:block}
-body.fs .grp{right:18px;bottom:44px}body.fs .fs-btn{width:48px;height:48px}body.fs .fs-btn svg{width:23px;height:23px}
+/* ===== Button styling matched to The Ethels map (styling only) ===== */
+.mapboxgl-ctrl-group:not(:empty){background:transparent!important;box-shadow:none!important;border-radius:0!important;display:flex;flex-direction:column;gap:10px}
+.mapboxgl-ctrl-group button,.mapboxgl-ctrl-group button:first-child,.mapboxgl-ctrl-group button:last-child,.mapboxgl-ctrl-group button:only-child{width:50px!important;height:50px!important;border-radius:999px!important;border:1px solid rgba(255,255,255,.6)!important;background-color:rgba(255,255,255,.55)!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.85),inset 0 -2px 6px rgba(255,255,255,.25),0 4px 14px rgba(0,0,0,.28)!important;-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);transition:.15s;-webkit-tap-highlight-color:transparent;display:flex!important;align-items:center;justify-content:center;padding:0}
+@supports((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.mapboxgl-ctrl-group button,.mapboxgl-ctrl-group button:first-child,.mapboxgl-ctrl-group button:last-child,.mapboxgl-ctrl-group button:only-child{background-color:rgba(255,255,255,.28)!important}}
+.mapboxgl-ctrl-bottom-right{gap:10px!important}
+.mapboxgl-ctrl-group button+button{border-top:1px solid rgba(255,255,255,.6)!important}
+@media(hover:hover){.mapboxgl-ctrl-group button:not(:disabled):hover{background-color:rgba(56,153,236,.35)!important}}
+.mapboxgl-ctrl-group button:focus{outline:0;box-shadow:inset 0 1px 1px rgba(255,255,255,.85),inset 0 -2px 6px rgba(255,255,255,.25),0 4px 14px rgba(0,0,0,.28)!important}
+.mapboxgl-ctrl-group button .mapboxgl-ctrl-icon{background-size:40px 40px;filter:brightness(0) opacity(.89)}
+.mapboxgl-ctrl-group button svg{width:22px;height:22px}
+.mapboxgl-ctrl-group button svg *{stroke:#1c1c1e}
+@media (max-width:767px){
+  .mapboxgl-ctrl-group button,.mapboxgl-ctrl-group button:first-child,.mapboxgl-ctrl-group button:last-child,.mapboxgl-ctrl-group button:only-child{width:38px!important;height:38px!important}
+  .mapboxgl-ctrl-group:not(:empty){gap:10px}
+  .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon{background-size:30px 30px}
+  .mapboxgl-ctrl-group button svg{width:16px;height:16px}
+}
 </style>
 </head>
 <body>
   <div id="map"></div>
-  <div class="grp">
-    <button id="b-in" class="fs-btn" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button id="b-out" class="fs-btn" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
-    <button id="b-reset" class="fs-btn" title="Show all the parking" aria-label="Show all the parking"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg></button>
-    <button id="b-fs" class="fs-btn" title="Fullscreen" aria-label="Fullscreen"><svg id="i-exp" viewBox="0 0 24 24"><polyline points="4,9 4,4 9,4"/><polyline points="20,9 20,4 15,4"/><polyline points="4,15 4,20 9,20"/><polyline points="20,15 20,20 15,20"/></svg><svg id="i-col" viewBox="0 0 24 24" style="display:none"><polyline points="4,9 9,9 9,4"/><polyline points="20,9 15,9 15,4"/><polyline points="4,15 9,15 9,20"/><polyline points="20,15 15,15 15,20"/></svg></button>
-  </div>
 
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
   <script>
@@ -90,37 +91,11 @@ body.fs .grp{right:18px;bottom:44px}body.fs .fs-btn{width:48px;height:48px}body.
       container: "map",
       style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: carParks[0].coords,
-      zoom: 15,
-      attributionControl: false
+      zoom: 15
     });
-    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
 
-    /* buttons */
-    document.getElementById("b-in").onclick = () => map.zoomIn();
-    document.getElementById("b-out").onclick = () => map.zoomOut();
-    function showAll(d) {
-      const b = new mapboxgl.LngLatBounds();
-      carParks.forEach(p => b.extend(p.coords));
-      map.fitBounds(b, { padding: { top: 70, bottom: 50, left: 40, right: 70 }, maxZoom: 15.5, duration: d });
-    }
-    document.getElementById("b-reset").onclick = () => { if (openPopup) openPopup.remove(); showAll(900); };
-    /* full screen: on a Lost Peak page the page grows this map to fill the screen (works on iPhone too) */
-    const EMBEDDED = window.self !== window.top;
-    let fsOn = false;
-    function setFs(on) {
-      fsOn = on;
-      document.body.classList.toggle("fs", on);
-      document.getElementById("i-exp").style.display = on ? "none" : "block";
-      document.getElementById("i-col").style.display = on ? "block" : "none";
-      setTimeout(() => map.resize(), 60); setTimeout(() => map.resize(), 400);
-    }
-    document.getElementById("b-fs").onclick = () => {
-      if (EMBEDDED) { setFs(!fsOn); try { window.parent.postMessage({ type: "lpFs", on: fsOn }, "*"); } catch (e) {} return; }
-      if (!document.fullscreenElement) { (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || function(){}).call(document.documentElement); }
-      else if (document.exitFullscreen) document.exitFullscreen();
-    };
-    document.addEventListener("fullscreenchange", () => setFs(!!document.fullscreenElement));
-    document.addEventListener("keydown", e => { if (e.key === "Escape" && fsOn && EMBEDDED) { setFs(false); try { window.parent.postMessage({ type: "lpFs", on: false }, "*"); } catch (x) {} } });
+    map.addControl(new mapboxgl.FullscreenControl(), "top-right");
+    map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
     function popupHtml(name, coords) {
       return `
@@ -170,7 +145,7 @@ body.fs .grp{right:18px;bottom:44px}body.fs .fs-btn{width:48px;height:48px}body.
         .addTo(map);
 
       openPopup = firstPopup;
-      map.jumpTo({ center: first.coords, zoom: 15 });
+      map.flyTo({ center: first.coords, zoom: 15, essential: true });
     });
   </script>
 </body>
